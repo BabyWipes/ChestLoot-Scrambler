@@ -1,5 +1,6 @@
 package com.huskehhh.chestlootscrambler;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -104,15 +105,21 @@ public class Utility {
             }
         } else {
 
-            for (int x = getMinX(loc.getBlockX(), loc1.getBlockX()); x <= getMaxX(loc.getBlockX(), loc1.getBlockX()); x++) {
-                for (int y = getMinY(loc.getBlockY(), loc1.getBlockY()); y <= getMaxY(loc.getBlockY(), loc1.getBlockY()); y++) {
-                    for (int z = getMinZ(loc.getBlockZ(), loc1.getBlockZ()); z <= getMaxZ(loc.getBlockZ(), loc1.getBlockZ()); z++) {
-                        addChest(new Location(loc.getWorld(), x, y, z));
+            Chunk[] chunks = loc.getWorld().getLoadedChunks();
+            for (int i = 0; i <= chunks.length - 1; i++) {
+                if (chunks[i] != null) {
+                    BlockState[] chests = chunks[i].getTileEntities();
+                    for (int x = 0; x <= chests.length - 1; x++) {
+                        if (chests[x] != null) {
+                            if (chests[x].getBlock().getType() == Material.CHEST) {
+                                addChest(chests[x].getBlock().getLocation());
+                            }
+                        }
                     }
                 }
             }
-
         }
+
     }
 
     private static void addChest(Location loc) {
