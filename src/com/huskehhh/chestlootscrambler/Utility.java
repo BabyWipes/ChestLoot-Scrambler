@@ -20,39 +20,40 @@ public class Utility {
 
     private static List<Location> chestLocs = new ArrayList<Location>();
 
-    public static void scrambleChestLoot() {
+    private static void scrambleChestLoot() {
         for (int i = 0; i <= chestLocs.size() - 1; i++) {
             Random rand = new Random();
             int r = rand.nextInt(chestLocs.size());
             BlockState state = chestLocs.get(r).getBlock().getState();
             if (state.getBlock().getType() == Material.CHEST) {
-                Chest chest = (Chest) state.getBlock();
+                Chest chest = (Chest) state;
                 Inventory inv = chest.getBlockInventory();
-                r = rand.nextInt(chestLocs.size());
+                r = rand.nextInt(gearSwap.size());
                 inv.setContents(gearSwap.get(r));
-                gearSwap.remove(r);
+                gearSwap.remove(gearSwap.get(r));
             }
         }
     }
 
-    public static void getGear() {
+    private static void getGear() {
         for (int i = 0; i <= chestLocs.size() - 1; i++) {
             Block block = chestLocs.get(i).getBlock();
             BlockState state = block.getState();
-            if (block.getType() == Material.CHEST) {
-                Chest chest = (Chest) state.getBlock();
+            if (state.getBlock().getType() == Material.CHEST) {
+                Chest chest = (Chest) state;
                 Inventory inv = chest.getBlockInventory();
                 gearSwap.add(inv.getContents());
             }
         }
+        scrambleChestLoot();
     }
 
-    public static void getChests(World w) {
+    private static void getChests(World w) {
         Chunk[] chunks = w.getLoadedChunks();
-        for (int i = 0; i <= chunks.length - 1; i++) {
+        for (int i = 0; i <= (chunks.length - 1); i++) {
             if (chunks[i] != null) {
                 BlockState[] chests = chunks[i].getTileEntities();
-                for (int x = 0; x <= chests.length - 1; x++) {
+                for (int x = 0; x <= (chests.length - 1); x++) {
                     if (chests[x] != null) {
                         if (chests[x].getBlock().getType() == Material.CHEST) {
                             chestLocs.add(chests[x].getBlock().getLocation());
@@ -61,6 +62,11 @@ public class Utility {
                 }
             }
         }
+        getGear();
+    }
+
+    public static void prepareScrambler(World w) {
+        getChests(w);
     }
 
 }
